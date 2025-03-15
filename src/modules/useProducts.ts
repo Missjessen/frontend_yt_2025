@@ -1,5 +1,8 @@
 import { ref } from 'vue';
 import type {newProducts, Product} from '../interfaces/interfaces';
+import type { promise } from 'dns';
+
+
 
 
 
@@ -134,7 +137,53 @@ const removeProductFromState = (id: string): void => {
 
   }
 
-return { error, loading, products, fetchProducts, deleteProduct, addProducts, getTokenAndUserId };
+  const updateProductOnServer = async (id: string, updateProduct: Partial<Product>, token: string): Promise<Product> => {
+    const response = await fetch(`${API_URL}products/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': token
+      },
+      body: JSON.stringify(updateProduct)
+    })
+    if (!response.ok) {
+
+      throw new Error('No data available');
+    }
+    const responseText = await response.text();
+    try {
+      return JSON.parse(responseText);
+    }
+    catch{
+      return { message: responseText } as unknown as Product;
+    //return await response.json();
+
+
+  }
+}
+
+
+const updateProductInState = (id: string, updatedProduct: Product): void => {
+  const index = products.value.findIndex(product => product._id === id);
+  if (index !== -1) {
+    products.value[index] = updatedProduct;
+  }
+}
+
+const updateProduct = async (id: string, updatedProduct: Partial<Product>): Promise<void> => {
+  try {
+    const { token } = getTokenAndUserId();
+    const updatedProductResponse = await updateProductOnServer(id, updatedProduct, token);
+    updateProductInState(id, updatedProductResponse);
+    await fetchProducts();
+  }
+  catch (err) {
+    error.value = (err as Error).message
+  }
+}
+
+
+return { error, loading, products, fetchProducts, deleteProduct, addProducts, getTokenAndUserId, updateProduct };
 
 }
 

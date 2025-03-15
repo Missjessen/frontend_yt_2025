@@ -28,9 +28,20 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       component: () => import('../views/admin/AdminView.vue'),
+      meta: { requireAuth: true },
     },
+
   ],
 })
 
+router.beforeEach ((to, _from, next) => {
+  const isAuthenticated = localStorage.getItem('lsToken');
+  const requireAuth = to.matched.some(record => record.meta.requireAuth);
 
+  if (requireAuth && !isAuthenticated) {
+    next('/auth');
+  } else {
+    next();
+  }
+})
 export default router

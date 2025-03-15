@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import type { User } from '../../interfaces/interfaces';
+import { state } from '../globalStates/state';
 
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -7,7 +8,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const useUser = () => {
 
   const token = ref<string | null>(null);
-  const isLoggedIn = ref<boolean>(false);
+  //const isLoggedIn = ref<boolean>(false);
   const error = ref<string | null>(null);
   const user = ref<User | null>(null);
 
@@ -36,7 +37,7 @@ export const useUser = () => {
       const authResponse = await response.json()
       token.value = authResponse.data.token
       user.value = authResponse.data.user
-      isLoggedIn.value = true
+      state.isLoggedIn = true
 
       localStorage.setItem('lsToken', authResponse.data.token);
       localStorage.setItem('userIDToken', authResponse.data.userId)
@@ -45,7 +46,7 @@ export const useUser = () => {
     }
     catch (err) {
       error.value = (err as Error).message || 'An error occurred'
-      isLoggedIn.value = false
+      state.isLoggedIn = false
     }
 
   }
@@ -100,12 +101,12 @@ export const useUser = () => {
   const logout = () => {
     token.value = null;
     user.value = null;
-    isLoggedIn.value = false;
+    state.isLoggedIn = false;
     localStorage.removeItem('lsToken');
 
     console.log('user is logged out')
 
   }
 
-  return { token, isLoggedIn, error, user, name, email, password, fetchToken, logout, registerUser };
+  return { token, isLoggedIn: state.isLoggedIn, error, user, name, email, password, fetchToken, logout, registerUser };
 }
