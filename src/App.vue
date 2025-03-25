@@ -1,7 +1,6 @@
-<template>
-  <div class="w-screen">
-    <header class="text-white py-4">
-      <div class="wrapper" >
+<template class="w-screen">
+  <header class="text-white py-4">
+    <div class="wrapper" >
 
       <nav class="">
         <RouterLink to="/" class="mr-4">Home</RouterLink>
@@ -10,35 +9,42 @@
         <RouterLink to="/auth" class="mr-4">Auth</RouterLink>
         <RouterLink v-if="isLoggedIn" to="/admin" class="mr-4">Admin</RouterLink>
 
-        <button v-if="isLoggedIn" @click="logout"> Loguot</button>
-
-
+        <button v-if="isLoggedIn" @click="logout">Logout</button>
         <!-- RouterLink to products, Auth, Admin & and logout button -->
 
 
-
         <!-- toggle cart button -->
-
+        <button @click="toggleCart" class="mx-6"> Cart</button>
 
         <!-- Routerlink to orders -->
+
 
       </nav>
     </div>
   </header>
 
+  <RouterView />
 
-<RouterView />
-
-<!-- CartBasket component -->
-</div>
-
+  <!-- CartBasket component -->
+  <!-- <CartBasket v-model="isCartVisible" :isVisible="isCartVisible" /> -->
+  <CartBasket v-model:isVisible="isCartVisible" />
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { useUser } from './modules/auth/useUser'
 import { state } from './modules/globalStates/state'
+
+import CartBasket from './components/cart/CartBasketView.vue'
+
+const isCartVisible = ref(false)
+
+const toggleCart = () => {
+  isCartVisible.value = !isCartVisible.value
+
+}
+
 
 const { logout } = useUser()
 
